@@ -4,9 +4,6 @@ import (
 	"net"
 )
 
-// Address represents vanilla IP address.
-type Address = net.IP
-
 // Network represents vanilla IP network.
 // It's IP range defined by CIDR notation.
 type Network = net.IPNet
@@ -47,7 +44,7 @@ func Supernet(network *Network, targetPrefixLen int) *Network {
 		ip := to32(v4)
 		mask := ((uint32(1) << targetPrefixLen) - 1) << (bits - targetPrefixLen)
 
-		outIP := make(Address, net.IPv4len)
+		outIP := make(net.IP, net.IPv4len)
 		from32(ip&mask, outIP)
 		return &Network{
 			IP:   outIP,
@@ -63,7 +60,7 @@ func Supernet(network *Network, targetPrefixLen int) *Network {
 			Minus(uint128{0, 1}).
 			Lsh(uint(bits - targetPrefixLen))
 
-		outIP := make(Address, net.IPv6len)
+		outIP := make(net.IP, net.IPv6len)
 		from128(ip.And(mask), outIP)
 		return &Network{
 			IP:   outIP,
@@ -75,7 +72,7 @@ func Supernet(network *Network, targetPrefixLen int) *Network {
 }
 
 // Broadcast returns the broadcast IP address for the provided network.
-func Broadcast(network *Network) Address {
+func Broadcast(network *Network) net.IP {
 	if network == nil {
 		return nil // no network, no address
 	}
@@ -87,7 +84,7 @@ func Broadcast(network *Network) Address {
 		ip := to32(v4)
 		mask := (uint32(1) << (bits - ones)) - 1
 
-		out := make(Address, net.IPv4len)
+		out := make(net.IP, net.IPv4len)
 		from32(ip|mask, out)
 		return out
 	}
@@ -99,7 +96,7 @@ func Broadcast(network *Network) Address {
 			Lsh(uint(bits - ones)).
 			Minus(uint128{0, 1})
 
-		out := make(Address, net.IPv6len)
+		out := make(net.IP, net.IPv6len)
 		from128(ip.Or(mask), out)
 		return out
 	}

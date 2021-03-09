@@ -8,7 +8,7 @@ import (
 
 // SummarizeRange returns a series of networks which cover the range
 // between the first and last addresses, inclusive.
-func SummarizeRange(first, last Address) (Networks, error) {
+func SummarizeRange(first, last net.IP) (Networks, error) {
 	// first IPv4 or IPv6
 	var firstV4, firstV6 net.IP
 	switch len(first) {

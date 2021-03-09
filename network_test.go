@@ -208,3 +208,8 @@ func ExampleIsSupernet() {
 	// true
 	// true
 }
+
+func cidr(cidrS string) *net.IPNet {
+	_, ipNet, _ := net.ParseCIDR(cidrS)
+	return ipNet
+}
