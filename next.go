@@ -7,7 +7,7 @@ import (
 // NextNetwork returns the next network of the same mask.
 // The step argument can be positive returning next network,
 // or negative returning previous network.
-func NextNetwork(network *Network, step int) *Network {
+func NextNetwork(network *net.IPNet, step int) *net.IPNet {
 	if network == nil || step == 0 {
 		return network // network is the same
 	}
@@ -26,7 +26,7 @@ func NextNetwork(network *Network, step int) *Network {
 
 		outIP := make(net.IP, net.IPv4len)
 		from32(u, outIP)
-		return &Network{
+		return &net.IPNet{
 			IP:   outIP,
 			Mask: network.Mask,
 		}
@@ -46,7 +46,7 @@ func NextNetwork(network *Network, step int) *Network {
 
 		outIP := make(net.IP, net.IPv6len)
 		from128(u, outIP)
-		return &Network{
+		return &net.IPNet{
 			IP:   outIP,
 			Mask: network.Mask,
 		}

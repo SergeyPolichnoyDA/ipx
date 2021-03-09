@@ -111,7 +111,7 @@ func TestSummarizeRange(tt *testing.T) {
 			net.ParseIP("192.168.2.100"),
 		)
 		require.NoError(t, err, "failed to summarize range")
-		assert.Empty(t, nwks.Strings())
+		assert.Empty(t, Networks(nwks).Strings())
 	})
 
 	tt.Run("ipv4_simple", func(t *testing.T) {
@@ -124,7 +124,7 @@ func TestSummarizeRange(tt *testing.T) {
 			"192.0.2.0/25",
 			"192.0.2.128/31",
 			"192.0.2.130/32",
-		}, nwks.Strings())
+		}, Networks(nwks).Strings())
 	})
 
 	tt.Run("ipv4_32", func(t *testing.T) {
@@ -135,7 +135,7 @@ func TestSummarizeRange(tt *testing.T) {
 		require.NoError(t, err, "failed to summarize range")
 		assert.Equal(t, []string{
 			"192.0.2.100/32",
-		}, nwks.Strings())
+		}, Networks(nwks).Strings())
 	})
 
 	tt.Run("ipv4_16", func(t *testing.T) {
@@ -146,7 +146,7 @@ func TestSummarizeRange(tt *testing.T) {
 		require.NoError(t, err, "failed to summarize range")
 		assert.Equal(t, []string{
 			"192.168.0.0/16",
-		}, nwks.Strings())
+		}, Networks(nwks).Strings())
 	})
 
 	tt.Run("ipv4_all", func(t *testing.T) {
@@ -157,7 +157,7 @@ func TestSummarizeRange(tt *testing.T) {
 		require.NoError(t, err, "failed to summarize range")
 		assert.Equal(t, []string{
 			"0.0.0.0/0",
-		}, nwks.Strings())
+		}, Networks(nwks).Strings())
 	})
 
 	tt.Run("ipv4_odd_start", func(t *testing.T) {
@@ -173,7 +173,7 @@ func TestSummarizeRange(tt *testing.T) {
 			"192.0.2.112/28",
 			"192.0.2.128/31",
 			"192.0.2.130/32",
-		}, nwks.Strings())
+		}, Networks(nwks).Strings())
 	})
 
 	tt.Run("ipv6_no_overlap", func(t *testing.T) {
@@ -182,7 +182,7 @@ func TestSummarizeRange(tt *testing.T) {
 			net.ParseIP("::100"),
 		)
 		require.NoError(t, err, "failed to summarize range")
-		assert.Empty(t, nwks.Strings())
+		assert.Empty(t, Networks(nwks).Strings())
 	})
 
 	tt.Run("ipv6_128", func(t *testing.T) {
@@ -193,7 +193,7 @@ func TestSummarizeRange(tt *testing.T) {
 		require.NoError(t, err, "failed to summarize range")
 		assert.Equal(t, []string{
 			"::100/128",
-		}, nwks.Strings())
+		}, Networks(nwks).Strings())
 	})
 
 	tt.Run("ipv6_16", func(t *testing.T) {
@@ -204,7 +204,7 @@ func TestSummarizeRange(tt *testing.T) {
 		require.NoError(t, err, "failed to summarize range")
 		assert.Equal(t, []string{
 			"1::/16",
-		}, nwks.Strings())
+		}, Networks(nwks).Strings())
 	})
 
 	tt.Run("ipv6_all", func(t *testing.T) {
@@ -215,7 +215,7 @@ func TestSummarizeRange(tt *testing.T) {
 		require.NoError(t, err, "failed to summarize range")
 		assert.Equal(t, []string{
 			"::/0",
-		}, nwks.Strings())
+		}, Networks(nwks).Strings())
 	})
 
 	tt.Run("ipv6_odd_start", func(t *testing.T) {
@@ -232,6 +232,6 @@ func TestSummarizeRange(tt *testing.T) {
 			"1::10/124",
 			"1::20/124",
 			"1::30/128",
-		}, nwks.Strings())
+		}, Networks(nwks).Strings())
 	})
 }

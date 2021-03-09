@@ -10,6 +10,23 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// Networks is a slice of IP networks.
+type Networks []*net.IPNet
+
+// Strings get all networks as string representation.
+func (nn Networks) Strings() []string {
+	if nn == nil {
+		return nil
+	}
+
+	out := make([]string, 0, len(nn))
+	for _, n := range nn {
+		out = append(out, n.String())
+	}
+
+	return out
+}
+
 // ExampleSupernet is an example for Supernet
 func ExampleSupernet() {
 	_, nwk, _ := net.ParseCIDR("192.0.2.100/24")

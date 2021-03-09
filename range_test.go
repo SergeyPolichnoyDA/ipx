@@ -60,7 +60,7 @@ func TestRangeSummarize(t *testing.T) {
 	r := ipx.NewRange(net.IPv4zero, net.IPv4bcast)
 	nwks, err := r.Summarize()
 	require.NoError(t, err, "failed to summarize IP range")
-	assert.Equal(t, []string{"0.0.0.0/0"}, nwks.Strings())
+	assert.Equal(t, []string{"0.0.0.0/0"}, Networks(nwks).Strings())
 }
 
 // TestRangeFromNetwork unit tests for RangeFromNetwork

@@ -8,7 +8,7 @@ import (
 
 // SummarizeRange returns a series of networks which cover the range
 // between the first and last addresses, inclusive.
-func SummarizeRange(first, last net.IP) (Networks, error) {
+func SummarizeRange(first, last net.IP) ([]*net.IPNet, error) {
 	// first IPv4 or IPv6
 	var firstV4, firstV6 net.IP
 	switch len(first) {
@@ -59,7 +59,7 @@ func SummarizeRange(first, last net.IP) (Networks, error) {
 
 // summarizeRange4 returns a series of IPv4 networks which cover the range
 // between the first and last IPv4 addresses, inclusive.
-func summarizeRange4(first, last uint32) (networks Networks) {
+func summarizeRange4(first, last uint32) (networks []*net.IPNet) {
 	for first <= last {
 		// the network will either be as long as all the trailing zeros of the first address OR the number of bits
 		// necessary to cover the distance between first and last address -- whichever is smaller
@@ -79,7 +79,7 @@ func summarizeRange4(first, last uint32) (networks Networks) {
 		nwkIP := make(net.IP, net.IPv4len)
 		from32(first, nwkIP)
 		networks = append(networks,
-			&Network{
+			&net.IPNet{
 				IP:   nwkIP,
 				Mask: nwkMask,
 			})
@@ -95,7 +95,7 @@ func summarizeRange4(first, last uint32) (networks Networks) {
 
 // summarizeRange6 returns a series of IPv6 networks which cover the range
 // between the first and last IPv6 addresses, inclusive.
-func summarizeRange6(first, last uint128) (networks Networks) {
+func summarizeRange6(first, last uint128) (networks []*net.IPNet) {
 	for first.Cmp(last) <= 0 { // first <= last
 		// the network will either be as long as all the trailing zeros of the first address OR the number of bits
 		// necessary to cover the distance between first and last address -- whichever is smaller
@@ -106,7 +106,7 @@ func summarizeRange6(first, last uint128) (networks Networks) {
 
 		// check extremes to make sure no overflow
 		if !first.Equal(uint128{0, 0}) || !last.Equal(uint128{maxUint64, maxUint64}) {
-			d := last.Minus(first).Add(uint128{0, 1})
+			d := last.Sub(first).Add(uint128{0, 1})
 			if z := 127 - d.LeadingZeros(); z < nBits {
 				nBits = z
 			}
@@ -116,7 +116,7 @@ func summarizeRange6(first, last uint128) (networks Networks) {
 		nwkIP := make(net.IP, net.IPv6len)
 		from128(first, nwkIP)
 		networks = append(networks,
-			&Network{
+			&net.IPNet{
 				IP:   nwkIP,
 				Mask: nwkMask,
 			})

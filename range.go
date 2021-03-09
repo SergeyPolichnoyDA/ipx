@@ -26,7 +26,7 @@ func NewRange(first net.IP, last net.IP) Range {
 }
 
 // Summarize returns a series of networks which cover the range.
-func (r Range) Summarize() (Networks, error) {
+func (r Range) Summarize() ([]*net.IPNet, error) {
 	return SummarizeRange(r.First, r.Last)
 }
 
@@ -34,7 +34,7 @@ func (r Range) Summarize() (Networks, error) {
 // The first and last IP addresses are inclusive.
 // Usually the first IP address is network address,
 // while the last IP address is broadcast address.
-func RangeFromNetwork(network *Network) (first net.IP, last net.IP) {
+func RangeFromNetwork(network *net.IPNet) (first net.IP, last net.IP) {
 	if network == nil {
 		return // no network, no IP range
 	}

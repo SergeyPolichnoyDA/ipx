@@ -4,30 +4,9 @@ import (
 	"net"
 )
 
-// Network represents vanilla IP network.
-// It's IP range defined by CIDR notation.
-type Network = net.IPNet
-
-// Networks is a slice of networks.
-type Networks []*Network
-
-// Strings get all networks as string representation.
-func (nn Networks) Strings() []string {
-	if nn == nil {
-		return nil
-	}
-
-	out := make([]string, 0, len(nn))
-	for _, n := range nn {
-		out = append(out, n.String())
-	}
-
-	return out
-}
-
 // Supernet returns a supernet for the provided network with the specified prefix length.
-// targetPrefixLen is the number of "one" bits in new supernet.
-func Supernet(network *Network, targetPrefixLen int) *Network {
+// targetPrefixLen is the number of "one" bits in new supernet mask.
+func Supernet(network *net.IPNet, targetPrefixLen int) *net.IPNet {
 	if network == nil {
 		return nil // no network, no supernet
 	}
@@ -46,7 +25,7 @@ func Supernet(network *Network, targetPrefixLen int) *Network {
 
 		outIP := make(net.IP, net.IPv4len)
 		from32(ip&mask, outIP)
-		return &Network{
+		return &net.IPNet{
 			IP:   outIP,
 			Mask: net.CIDRMask(targetPrefixLen, bits),
 		}
@@ -57,12 +36,12 @@ func Supernet(network *Network, targetPrefixLen int) *Network {
 		ip := to128(v6)
 		mask := uint128{0, 1}.
 			Lsh(uint(targetPrefixLen)).
-			Minus(uint128{0, 1}).
+			Sub(uint128{0, 1}).
 			Lsh(uint(bits - targetPrefixLen))
 
 		outIP := make(net.IP, net.IPv6len)
 		from128(ip.And(mask), outIP)
-		return &Network{
+		return &net.IPNet{
 			IP:   outIP,
 			Mask: net.CIDRMask(targetPrefixLen, bits),
 		}
@@ -72,7 +51,7 @@ func Supernet(network *Network, targetPrefixLen int) *Network {
 }
 
 // Broadcast returns the broadcast IP address for the provided network.
-func Broadcast(network *Network) net.IP {
+func Broadcast(network *net.IPNet) net.IP {
 	if network == nil {
 		return nil // no network, no address
 	}
@@ -94,7 +73,7 @@ func Broadcast(network *Network) net.IP {
 		ip := to128(network.IP)
 		mask := uint128{0, 1}.
 			Lsh(uint(bits - ones)).
-			Minus(uint128{0, 1})
+			Sub(uint128{0, 1})
 
 		out := make(net.IP, net.IPv6len)
 		from128(ip.Or(mask), out)
@@ -105,7 +84,7 @@ func Broadcast(network *Network) net.IP {
 }
 
 // IsSubnet returns whether b is a subnet of a.
-func IsSubnet(a, b *Network) bool {
+func IsSubnet(a, b *net.IPNet) bool {
 	if !a.Contains(b.IP) {
 		return false
 	}
@@ -116,6 +95,6 @@ func IsSubnet(a, b *Network) bool {
 }
 
 // IsSupernet returns whether b is a supernet of a.
-func IsSupernet(a, b *Network) bool {
+func IsSupernet(a, b *net.IPNet) bool {
 	return IsSubnet(b, a)
 }
