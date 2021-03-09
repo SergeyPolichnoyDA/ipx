@@ -43,24 +43,31 @@ func (u uint128) Equal(other uint128) bool {
 		(u.L == other.L)
 }
 
-func (u uint128) Add(addend uint128) uint128 {
-	old := u.L
-	u.H += addend.H
-	u.L += addend.L
-	if u.L < old { // wrapped
+// Add does addition of two uint128 integers.
+func (u uint128) Add(v uint128) uint128 {
+	oldL := u.L
+	u.H += v.H
+	u.L += v.L
+	if u.L < oldL { // wrapped
 		u.H++
 	}
 	return u
 }
 
-func (u uint128) Minus(addend uint128) uint128 {
-	old := u.L
-	u.H -= addend.H
-	u.L -= addend.L
-	if u.L > old { // wrapped
+// Sub does subtraction of two uint128 integers.
+func (u uint128) Sub(v uint128) uint128 {
+	oldL := u.L
+	u.H -= v.H
+	u.L -= v.L
+	if u.L > oldL { // wrapped
 		u.H--
 	}
 	return u
+}
+
+// TODO: consider to remove this alias
+func (u uint128) Minus(addend uint128) uint128 {
+	return u.Sub(addend)
 }
 
 func (u uint128) Lsh(bits uint) uint128 {

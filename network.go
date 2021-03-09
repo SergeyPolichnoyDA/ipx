@@ -4,6 +4,9 @@ import (
 	"net"
 )
 
+// Address represents vanilla IP address.
+type Address = net.IP
+
 // Network represents vanilla IP network.
 // It's IP range defined by CIDR notation.
 type Network = net.IPNet
@@ -39,39 +42,43 @@ func Supernet(network *Network, targetPrefixLen int) *Network {
 		return nil // invalid target prefix length
 	}
 
-	out := &Network{
-		IP:   make(net.IP, len(network.IP)),
-		Mask: net.CIDRMask(targetPrefixLen, bits),
-	}
-
 	// IPv4
 	if v4 := network.IP.To4(); v4 != nil {
 		ip := to32(v4)
 		mask := ((uint32(1) << targetPrefixLen) - 1) << (bits - targetPrefixLen)
 
-		from32(ip&mask, out.IP)
-		return out
+		outIP := make(Address, net.IPv4len)
+		from32(ip&mask, outIP)
+		return &Network{
+			IP:   outIP,
+			Mask: net.CIDRMask(targetPrefixLen, bits),
+		}
 	}
 
 	// IPv6
-	ip := to128(network.IP)
-	mask := uint128{0, 1}.
-		Lsh(uint(targetPrefixLen)).
-		Minus(uint128{0, 1}).
-		Lsh(uint(bits - targetPrefixLen))
+	if v6 := network.IP.To16(); v6 != nil {
+		ip := to128(v6)
+		mask := uint128{0, 1}.
+			Lsh(uint(targetPrefixLen)).
+			Minus(uint128{0, 1}).
+			Lsh(uint(bits - targetPrefixLen))
 
-	from128(ip.And(mask), out.IP)
-	return out
+		outIP := make(Address, net.IPv6len)
+		from128(ip.And(mask), outIP)
+		return &Network{
+			IP:   outIP,
+			Mask: net.CIDRMask(targetPrefixLen, bits),
+		}
+	}
+
+	return nil // bad input address length
 }
 
 // Broadcast returns the broadcast IP address for the provided network.
-func Broadcast(network *Network) net.IP {
+func Broadcast(network *Network) Address {
 	if network == nil {
 		return nil // no network, no address
 	}
-
-	out := make(net.IP, len(network.IP))
-	copy(out, network.IP)
 
 	ones, bits := network.Mask.Size()
 
@@ -80,18 +87,24 @@ func Broadcast(network *Network) net.IP {
 		ip := to32(v4)
 		mask := (uint32(1) << (bits - ones)) - 1
 
+		out := make(Address, net.IPv4len)
 		from32(ip|mask, out)
 		return out
 	}
 
 	// IPv6
-	ip := to128(network.IP)
-	mask := uint128{0, 1}.
-		Lsh(uint(bits - ones)).
-		Minus(uint128{0, 1})
+	if v6 := network.IP.To16(); v6 != nil {
+		ip := to128(network.IP)
+		mask := uint128{0, 1}.
+			Lsh(uint(bits - ones)).
+			Minus(uint128{0, 1})
 
-	from128(ip.Or(mask), out)
-	return out
+		out := make(Address, net.IPv6len)
+		from128(ip.Or(mask), out)
+		return out
+	}
+
+	return nil // bad input address length
 }
 
 // IsSubnet returns whether b is a subnet of a.

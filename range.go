@@ -1,9 +1,5 @@
 package ipx
 
-import (
-	"net"
-)
-
 // Range represents [first, last] IP range.
 // Range can represent any IP range comparing to Network
 // which can represent only ranges defined by CIDR notation.
@@ -13,12 +9,12 @@ import (
 // If `first == last` IP range contains single address.
 // If `first > last` IP range considered as empty.
 type Range struct {
-	First net.IP `json:"first,string"`
-	Last  net.IP `json:"last,string"`
+	First Address `json:"first,string"`
+	Last  Address `json:"last,string"`
 }
 
 // NewRange is helper function to construct IP range.
-func NewRange(first net.IP, last net.IP) Range {
+func NewRange(first Address, last Address) Range {
 	return Range{
 		First: first,
 		Last:  last,
@@ -34,7 +30,7 @@ func (r Range) Summarize() (Networks, error) {
 // The first and last IP addresses are inclusive.
 // Usually the first IP address is network address,
 // while the last IP address is broadcast address.
-func RangeFromNetwork(network *Network) (first net.IP, last net.IP) {
+func RangeFromNetwork(network *Network) (first Address, last Address) {
 	if network == nil {
 		return // no network, no IP range
 	}
@@ -44,8 +40,8 @@ func RangeFromNetwork(network *Network) (first net.IP, last net.IP) {
 		return // inconsistent length: IP address and IP mask
 	}
 
-	first = make(net.IP, n)
-	last = make(net.IP, n)
+	first = make(Address, n)
+	last = make(Address, n)
 	for i := 0; i < n; i++ {
 		first[i] = network.IP[i] & network.Mask[i]
 		last[i] = network.IP[i] | ^network.Mask[i]

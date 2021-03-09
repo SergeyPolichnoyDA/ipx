@@ -39,6 +39,7 @@ func BenchmarkSummarizeRange(bb *testing.B) {
 		return func(b *testing.B) {
 			ipFirst := net.ParseIP(first)
 			ipLast := net.ParseIP(last)
+
 			b.ReportAllocs()
 			b.ResetTimer()
 			for i := 0; i < b.N; i++ {

@@ -29,6 +29,11 @@ func TestSupernet(tt *testing.T) {
 		require.NoError(t, err, "failed to parse CIDR")
 		supernet = ipx.Supernet(nwk, 26)
 		assert.Nil(t, supernet)
+
+		// bad address length
+		nwk.IP = make(net.IP, 3)
+		supernet = ipx.Supernet(nwk, 24)
+		assert.Nil(t, supernet)
 	})
 
 	tt.Run("ipv4_one_level", func(t *testing.T) {
@@ -126,6 +131,10 @@ func ExampleBroadcast() {
 func TestBroadcast(tt *testing.T) {
 	tt.Run("bad", func(t *testing.T) {
 		out := ipx.Broadcast(nil)
+		assert.Nil(t, out)
+
+		// bad address length
+		out = ipx.Broadcast(&net.IPNet{IP: make(net.IP, 3)})
 		assert.Nil(t, out)
 	})
 

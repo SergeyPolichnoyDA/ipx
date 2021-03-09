@@ -233,3 +233,8 @@ func TestCmpNet(t *testing.T) {
 		})
 	}
 }
+
+func cidr(cidrS string) *net.IPNet {
+	_, ipNet, _ := net.ParseCIDR(cidrS)
+	return ipNet
+}
