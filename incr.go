@@ -1,7 +1,6 @@
 package ipx
 
 import (
-	"encoding/binary"
 	"errors"
 	"net"
 )
@@ -68,14 +67,4 @@ func IncrNet(ipNet *net.IPNet, incr int) {
 	b = b.Lsh(suffix)
 
 	from128(b, ipNet.IP)
-}
-
-func to32(ip []byte) uint32 {
-	l := len(ip)
-	return binary.BigEndian.Uint32(ip[l-4:])
-}
-
-func from32(n uint32, ip []byte) {
-	l := len(ip)
-	binary.BigEndian.PutUint32(ip[l-4:], n)
 }

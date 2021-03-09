@@ -37,7 +37,7 @@ func (u uint128) Cmp(other uint128) int {
 }
 
 // Equal checks 128-bit values are equal.
-// Equivalent of `u.Cmp(other) == 0` but a bit fater.
+// Equivalent of `u.Cmp(other) == 0` but a bit faster.
 func (u uint128) Equal(other uint128) bool {
 	return (u.H == other.H) &&
 		(u.L == other.L)
@@ -115,11 +115,18 @@ func (u uint128) LeadingZeros() int {
 	return z
 }
 
-func to128(ip []byte) uint128 {
-	return uint128{binary.BigEndian.Uint64(ip[:8]), binary.BigEndian.Uint64(ip[8:])}
+// to128 reads uint128 integer from raw 16 bytes.
+// big endian format is assumed.
+func to128(buf []byte) uint128 {
+	return uint128{
+		H: binary.BigEndian.Uint64(buf[:8]),
+		L: binary.BigEndian.Uint64(buf[8:]),
+	}
 }
 
-func from128(u uint128, ip []byte) {
-	binary.BigEndian.PutUint64(ip[:8], u.H)
-	binary.BigEndian.PutUint64(ip[8:], u.L)
+// from128 writes uint128 integer into the raw 16 bytes.
+// big endian format is assumed.
+func from128(u uint128, buf []byte) {
+	binary.BigEndian.PutUint64(buf[:8], u.H)
+	binary.BigEndian.PutUint64(buf[8:], u.L)
 }
