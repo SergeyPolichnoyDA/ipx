@@ -106,7 +106,7 @@ func summarizeRange6(first, last uint128) (networks []*net.IPNet) {
 
 		// check extremes to make sure no overflow
 		if !first.Equal(uint128{0, 0}) || !last.Equal(uint128{maxUint64, maxUint64}) {
-			d := last.Sub(first).Add(uint128{0, 1})
+			d := last.Sub(first).Add64(1)
 			if z := 127 - d.LeadingZeros(); z < nBits {
 				nBits = z
 			}

@@ -33,9 +33,9 @@ func BenchmarkUint128(b *testing.B) {
 			_ = left.Add(right)
 		}
 	})
-	b.Run("minus", func(b *testing.B) {
+	b.Run("sub", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			_ = left.Minus(right)
+			_ = left.Sub(right)
 		}
 	})
 	b.Run("lsh", func(b *testing.B) {
@@ -80,12 +80,12 @@ func TestUint128(t *testing.T) {
 
 		{
 			"minus",
-			uint128{maxUint64, maxUint64}.Minus(uint128{0, 1}),
+			uint128{maxUint64, maxUint64}.Sub64(1),
 			b().Sub(maxU128B, big.NewInt(1)),
 		},
 		{
 			"minus overflow",
-			uint128{0, 0}.Minus(uint128{0, 1}),
+			uint128{0, 0}.Sub64(1),
 			b().Or(b().Lsh(maxU64B, 64), maxU64B),
 		},
 

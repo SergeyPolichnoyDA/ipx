@@ -24,7 +24,7 @@ func Split(ipNet *net.IPNet, newPrefix int) *NetIter {
 
 	broadCast := uint128{0, 1}.
 		Lsh(uint(bits - ones)).
-		Minus(uint128{0, 1}).
+		Sub(uint128{0, 1}).
 		Or(ip)
 
 	return &NetIter{
@@ -68,7 +68,7 @@ func Hosts(ipNet *net.IPNet) *IPIter {
 
 	addend := uint128{0, 1}.
 		Lsh(uint(bits - ones)).
-		Minus(uint128{0, 2})
+		Sub(uint128{0, 2})
 
 	return iterIPv6(
 		ip,

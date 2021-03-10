@@ -54,6 +54,17 @@ func (u uint128) Add(v uint128) uint128 {
 	return u
 }
 
+// Add64 does addition of uint128 and uint64 integers.
+func (u uint128) Add64(v uint64) uint128 {
+	oldL := u.L
+	// u.H += 0
+	u.L += v
+	if u.L < oldL { // wrapped
+		u.H++
+	}
+	return u
+}
+
 // Sub does subtraction of two uint128 integers.
 func (u uint128) Sub(v uint128) uint128 {
 	oldL := u.L
@@ -65,9 +76,15 @@ func (u uint128) Sub(v uint128) uint128 {
 	return u
 }
 
-// TODO: consider to remove this alias
-func (u uint128) Minus(addend uint128) uint128 {
-	return u.Sub(addend)
+// Sub64 does subtraction of uint128 and uint64 integers.
+func (u uint128) Sub64(v uint64) uint128 {
+	oldL := u.L
+	// u.H -= 0
+	u.L -= v
+	if u.L > oldL { // wrapped
+		u.H--
+	}
+	return u
 }
 
 func (u uint128) Lsh(bits uint) uint128 {

@@ -48,7 +48,7 @@ func (i *IPIter) Next() bool {
 			}
 			from128(i.v6.val, i.ip)
 			old := i.v6.val
-			if i.v6.val = i.v6.val.Minus(i.v6.incr); old.Cmp(i.v6.val) == -1 {
+			if i.v6.val = i.v6.val.Sub(i.v6.incr); old.Cmp(i.v6.val) == -1 {
 				i.v6.val = uint128{0, 0}
 			}
 			return true

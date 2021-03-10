@@ -191,7 +191,7 @@ func (n ip6Net) asNet() *net.IPNet {
 }
 
 func (n ip6Net) mask() uint128 {
-	return uint128{0, 1}.Lsh(128 - uint(n.prefix)).Minus(uint128{0, 1}).Not()
+	return uint128{0, 1}.Lsh(128 - uint(n.prefix)).Sub64(1).Not()
 }
 
 func (n ip6Net) subnetOf(o ip6Net) bool {

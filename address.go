@@ -69,9 +69,9 @@ func NextIP(addr net.IP, step int) net.IP {
 	if v6 := addr.To16(); v6 != nil {
 		u := to128(v6)
 		if step > 0 {
-			u = u.Add(uint128{0, uint64(+step)})
+			u = u.Add64(uint64(+step))
 		} else {
-			u = u.Sub(uint128{0, uint64(-step)})
+			u = u.Sub64(uint64(-step))
 		}
 
 		out := make(net.IP, net.IPv6len)

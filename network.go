@@ -36,7 +36,7 @@ func Supernet(network *net.IPNet, targetPrefixLen int) *net.IPNet {
 		ip := to128(v6)
 		mask := uint128{0, 1}.
 			Lsh(uint(targetPrefixLen)).
-			Sub(uint128{0, 1}).
+			Sub64(1).
 			Lsh(uint(bits - targetPrefixLen))
 
 		outIP := make(net.IP, net.IPv6len)
@@ -73,7 +73,7 @@ func Broadcast(network *net.IPNet) net.IP {
 		ip := to128(network.IP)
 		mask := uint128{0, 1}.
 			Lsh(uint(bits - ones)).
-			Sub(uint128{0, 1})
+			Sub64(1)
 
 		out := make(net.IP, net.IPv6len)
 		from128(ip.Or(mask), out)
