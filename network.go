@@ -20,11 +20,11 @@ func Supernet(network *net.IPNet, targetPrefixLen int) *net.IPNet {
 
 	// IPv4
 	if v4 := network.IP.To4(); v4 != nil {
-		ip := to32(v4)
+		ip := load32(v4)
 		mask := ((uint32(1) << targetPrefixLen) - 1) << (bits - targetPrefixLen)
 
 		outIP := make(net.IP, net.IPv4len)
-		from32(ip&mask, outIP)
+		store32(ip&mask, outIP)
 		return &net.IPNet{
 			IP:   outIP,
 			Mask: net.CIDRMask(targetPrefixLen, bits),
@@ -33,14 +33,14 @@ func Supernet(network *net.IPNet, targetPrefixLen int) *net.IPNet {
 
 	// IPv6
 	if v6 := network.IP.To16(); v6 != nil {
-		ip := to128(v6)
+		ip := load128(v6)
 		mask := Uint128{Lo: 1}.
 			Lsh(uint(targetPrefixLen)).
 			Sub64(1).
 			Lsh(uint(bits - targetPrefixLen))
 
 		outIP := make(net.IP, net.IPv6len)
-		from128(ip.And(mask), outIP)
+		store128(ip.And(mask), outIP)
 		return &net.IPNet{
 			IP:   outIP,
 			Mask: net.CIDRMask(targetPrefixLen, bits),
@@ -60,23 +60,23 @@ func Broadcast(network *net.IPNet) net.IP {
 
 	// IPv4
 	if v4 := network.IP.To4(); v4 != nil {
-		ip := to32(v4)
+		ip := load32(v4)
 		mask := (uint32(1) << (bits - ones)) - 1
 
 		out := make(net.IP, net.IPv4len)
-		from32(ip|mask, out)
+		store32(ip|mask, out)
 		return out
 	}
 
 	// IPv6
 	if v6 := network.IP.To16(); v6 != nil {
-		ip := to128(network.IP)
+		ip := load128(network.IP)
 		mask := Uint128{Lo: 1}.
 			Lsh(uint(bits - ones)).
 			Sub64(1)
 
 		out := make(net.IP, net.IPv6len)
-		from128(ip.Or(mask), out)
+		store128(ip.Or(mask), out)
 		return out
 	}
 
@@ -112,7 +112,7 @@ func NextNetwork(network *net.IPNet, step int) *net.IPNet {
 		ones, bits := network.Mask.Size()
 		suffix := uint(bits - ones)
 
-		u := to32(v4)
+		u := load32(v4)
 		if step > 0 {
 			u += uint32(+step << suffix)
 		} else {
@@ -120,7 +120,7 @@ func NextNetwork(network *net.IPNet, step int) *net.IPNet {
 		}
 
 		outIP := make(net.IP, net.IPv4len)
-		from32(u, outIP)
+		store32(u, outIP)
 		return &net.IPNet{
 			IP:   outIP,
 			Mask: network.Mask,
@@ -132,7 +132,7 @@ func NextNetwork(network *net.IPNet, step int) *net.IPNet {
 		ones, bits := network.Mask.Size()
 		suffix := uint(bits - ones)
 
-		u := to128(v6)
+		u := load128(v6)
 		if step > 0 {
 			u = u.Add(Uint128{Lo: uint64(+step)}.Lsh(suffix))
 		} else {
@@ -140,7 +140,7 @@ func NextNetwork(network *net.IPNet, step int) *net.IPNet {
 		}
 
 		outIP := make(net.IP, net.IPv6len)
-		from128(u, outIP)
+		store128(u, outIP)
 		return &net.IPNet{
 			IP:   outIP,
 			Mask: network.Mask,

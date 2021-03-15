@@ -116,7 +116,7 @@ type ip4Net struct {
 
 func newIP4Net(ipN *net.IPNet) ip4Net {
 	ones, _ := ipN.Mask.Size()
-	return ip4Net{to32(ipN.IP), uint8(ones)}
+	return ip4Net{load32(ipN.IP), uint8(ones)}
 }
 
 func (n ip4Net) super() ip4Net {
@@ -127,8 +127,8 @@ func (n ip4Net) super() ip4Net {
 
 func (n ip4Net) asNet() *net.IPNet {
 	r := &net.IPNet{IP: make(net.IP, 4), Mask: make(net.IPMask, 4)}
-	from32(n.addr, r.IP)
-	from32(n.mask(), r.Mask) // set first eight bits
+	store32(n.addr, r.IP)
+	store32(n.mask(), r.Mask) // set first eight bits
 	return r
 }
 
@@ -167,7 +167,7 @@ type ip6Net struct {
 
 func newIP6Net(ipN *net.IPNet) ip6Net {
 	ones, _ := ipN.Mask.Size()
-	return ip6Net{to128(ipN.IP), uint8(ones)}
+	return ip6Net{load128(ipN.IP), uint8(ones)}
 }
 
 func (n ip6Net) super() ip6Net {
@@ -185,8 +185,8 @@ func (n ip6Net) subnets() (ip6Net, ip6Net) {
 
 func (n ip6Net) asNet() *net.IPNet {
 	r := &net.IPNet{IP: make(net.IP, 16), Mask: make(net.IPMask, 16)}
-	from128(n.addr, r.IP)
-	from128(n.mask(), r.Mask) // set prefix bits
+	store128(n.addr, r.IP)
+	store128(n.mask(), r.Mask) // set prefix bits
 	return r
 }
 

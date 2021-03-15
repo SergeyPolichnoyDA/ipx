@@ -48,7 +48,7 @@ func (i *IPIter) Next() bool {
 			if i.v6.val.Cmp(i.v6.limit) != 1 {
 				return false
 			}
-			from128(i.v6.val, i.ip)
+			store128(i.v6.val, i.ip)
 			old := i.v6.val
 			if i.v6.val = i.v6.val.Sub(i.v6.incr); old.Cmp(i.v6.val) == -1 {
 				i.v6.val = u128.Zero()
@@ -58,7 +58,7 @@ func (i *IPIter) Next() bool {
 		if i.v6.val.Cmp(i.v6.limit) != -1 {
 			return false
 		}
-		from128(i.v6.val, i.ip)
+		store128(i.v6.val, i.ip)
 		i.v6.val = i.v6.val.Add(i.v6.incr)
 		return true
 	}
@@ -66,14 +66,14 @@ func (i *IPIter) Next() bool {
 		if i.v4.val <= i.v4.limit {
 			return false
 		}
-		from32(i.v4.val, i.ip)
+		store32(i.v4.val, i.ip)
 		i.v4.val -= i.v4.incr
 		return true
 	}
 	if i.v4.val >= i.v4.limit {
 		return false
 	}
-	from32(i.v4.val, i.ip)
+	store32(i.v4.val, i.ip)
 	i.v4.val += i.v4.incr
 	return true
 }
@@ -159,14 +159,14 @@ func IterNet(start *net.IPNet, step int, end *net.IPNet) *NetIter {
 }
 
 func resolveIPs4(start net.IP, step int, end net.IP, shift uint) *IPIter {
-	sIP := to32(start)
+	sIP := load32(start)
 	if step > 0 {
 		eIP := uint32(maxUint32)
 		if end != nil {
 			if end.To4() == nil {
 				return new(IPIter)
 			}
-			eIP = to32(end)
+			eIP = load32(end)
 			if eIP <= sIP {
 				return new(IPIter)
 			}
@@ -178,7 +178,7 @@ func resolveIPs4(start net.IP, step int, end net.IP, shift uint) *IPIter {
 		if end.To4() == nil {
 			return new(IPIter)
 		}
-		eIP = to32(end)
+		eIP = load32(end)
 		if eIP >= sIP {
 			return new(IPIter)
 		}
@@ -187,14 +187,14 @@ func resolveIPs4(start net.IP, step int, end net.IP, shift uint) *IPIter {
 }
 
 func resolveIPs6(start net.IP, step int, end net.IP, shift uint) *IPIter {
-	sIP := to128(start)
+	sIP := load128(start)
 	if step > 0 {
 		eIP := u128.Max()
 		if end != nil {
 			if end.To4() != nil {
 				return new(IPIter)
 			}
-			eIP = to128(end)
+			eIP = load128(end)
 			if eIP.Cmp(sIP) != 1 {
 				return new(IPIter)
 			}
@@ -206,7 +206,7 @@ func resolveIPs6(start net.IP, step int, end net.IP, shift uint) *IPIter {
 		if end.To4() != nil {
 			return new(IPIter)
 		}
-		eIP = to128(end)
+		eIP = load128(end)
 		if eIP.Cmp(sIP) != -1 {
 			return new(IPIter)
 		}

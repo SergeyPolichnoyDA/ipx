@@ -12,7 +12,7 @@ import (
 func CompareIP(a, b net.IP) (int, error) {
 	// assume both are IPv4
 	if a4, b4 := a.To4(), b.To4(); a4 != nil && b4 != nil {
-		a, b := to32(a4), to32(b4)
+		a, b := load32(a4), load32(b4)
 		if a < b {
 			return -1, nil // a < b
 		} else if a > b {
@@ -23,7 +23,7 @@ func CompareIP(a, b net.IP) (int, error) {
 
 	// assume both or at least one is IPv6
 	if a6, b6 := a.To16(), b.To16(); a6 != nil && b6 != nil {
-		a, b := to128(a6), to128(b6)
+		a, b := load128(a6), load128(b6)
 		return a.Cmp(b), nil
 	}
 
@@ -53,7 +53,7 @@ func NextIP(addr net.IP, step int) net.IP {
 
 	// IPv4
 	if v4 := addr.To4(); v4 != nil {
-		u := to32(v4)
+		u := load32(v4)
 		if step > 0 {
 			u += uint32(+step)
 		} else {
@@ -61,13 +61,13 @@ func NextIP(addr net.IP, step int) net.IP {
 		}
 
 		out := make(net.IP, net.IPv4len)
-		from32(u, out)
+		store32(u, out)
 		return out
 	}
 
 	// IPv6
 	if v6 := addr.To16(); v6 != nil {
-		u := to128(v6)
+		u := load128(v6)
 		if step > 0 {
 			u = u.Add64(uint64(+step))
 		} else {
@@ -75,7 +75,7 @@ func NextIP(addr net.IP, step int) net.IP {
 		}
 
 		out := make(net.IP, net.IPv6len)
-		from128(u, out)
+		store128(u, out)
 		return out
 	}
 

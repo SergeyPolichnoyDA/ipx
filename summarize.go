@@ -51,9 +51,9 @@ func SummarizeRange(first, last net.IP) ([]*net.IPNet, error) {
 
 	switch {
 	case firstV4 != nil && lastV4 != nil:
-		return summarizeRange4(to32(firstV4), to32(lastV4)), nil
+		return summarizeRange4(load32(firstV4), load32(lastV4)), nil
 	case firstV6 != nil && lastV6 != nil:
-		return summarizeRange6(to128(firstV6), to128(lastV6)), nil
+		return summarizeRange6(load128(firstV6), load128(lastV6)), nil
 	}
 
 	return nil, ErrVersionMismatch
@@ -79,7 +79,7 @@ func summarizeRange4(first, last uint32) (networks []*net.IPNet) {
 
 		nwkMask := net.CIDRMask(32-nBits, 32)
 		nwkIP := make(net.IP, net.IPv4len)
-		from32(first, nwkIP)
+		store32(first, nwkIP)
 		networks = append(networks,
 			&net.IPNet{
 				IP:   nwkIP,
@@ -116,7 +116,7 @@ func summarizeRange6(first, last Uint128) (networks []*net.IPNet) {
 
 		nwkMask := net.CIDRMask(128-nBits, 128)
 		nwkIP := make(net.IP, net.IPv6len)
-		from128(first, nwkIP)
+		store128(first, nwkIP)
 		networks = append(networks,
 			&net.IPNet{
 				IP:   nwkIP,

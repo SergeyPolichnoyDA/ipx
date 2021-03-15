@@ -11,14 +11,14 @@ func Split(ipNet *net.IPNet, newPrefix int) *NetIter {
 		return new(NetIter)
 	}
 	if ipNet.IP.To4() != nil {
-		ip := to32(ipNet.IP)
+		ip := load32(ipNet.IP)
 		return &NetIter{
 			ips: *iterIPv4(ip, 1<<(bits-newPrefix), ip|(1<<(bits-ones)-1)),
 			net: &net.IPNet{Mask: net.CIDRMask(newPrefix, bits)},
 		}
 	}
 
-	ip := to128(ipNet.IP)
+	ip := load128(ipNet.IP)
 
 	incr := Uint128{Lo: 1}.Lsh(uint(bits - newPrefix))
 
@@ -37,14 +37,14 @@ func Split(ipNet *net.IPNet, newPrefix int) *NetIter {
 func Addresses(ipNet *net.IPNet) *IPIter {
 	ones, bits := ipNet.Mask.Size()
 	if ipNet.IP.To4() != nil {
-		ip := to32(ipNet.IP)
+		ip := load32(ipNet.IP)
 		return iterIPv4(
 			ip,
 			1,
 			ip+(1<<(bits-ones)),
 		)
 	}
-	ip := to128(ipNet.IP)
+	ip := load128(ipNet.IP)
 	return iterIPv6(
 		ip,
 		Uint128{Lo: 1},
@@ -56,7 +56,7 @@ func Addresses(ipNet *net.IPNet) *IPIter {
 func Hosts(ipNet *net.IPNet) *IPIter {
 	ones, bits := ipNet.Mask.Size()
 	if ipNet.IP.To4() != nil {
-		ip := to32(ipNet.IP) + 1
+		ip := load32(ipNet.IP) + 1
 		return iterIPv4(
 			ip,
 			1,
@@ -64,7 +64,7 @@ func Hosts(ipNet *net.IPNet) *IPIter {
 		)
 	}
 
-	ip := to128(ipNet.IP).Add64(1)
+	ip := load128(ipNet.IP).Add64(1)
 
 	addend := Uint128{Lo: 1}.
 		Lsh(uint(bits - ones)).
