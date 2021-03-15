@@ -34,7 +34,7 @@ func Supernet(network *net.IPNet, targetPrefixLen int) *net.IPNet {
 	// IPv6
 	if v6 := network.IP.To16(); v6 != nil {
 		ip := to128(v6)
-		mask := uint128{0, 1}.
+		mask := Uint128{Lo: 1}.
 			Lsh(uint(targetPrefixLen)).
 			Sub64(1).
 			Lsh(uint(bits - targetPrefixLen))
@@ -71,7 +71,7 @@ func Broadcast(network *net.IPNet) net.IP {
 	// IPv6
 	if v6 := network.IP.To16(); v6 != nil {
 		ip := to128(network.IP)
-		mask := uint128{0, 1}.
+		mask := Uint128{Lo: 1}.
 			Lsh(uint(bits - ones)).
 			Sub64(1)
 
@@ -134,9 +134,9 @@ func NextNetwork(network *net.IPNet, step int) *net.IPNet {
 
 		u := to128(v6)
 		if step > 0 {
-			u = u.Add(uint128{0, uint64(+step)}.Lsh(suffix))
+			u = u.Add(Uint128{Lo: uint64(+step)}.Lsh(suffix))
 		} else {
-			u = u.Sub(uint128{0, uint64(-step)}.Lsh(suffix))
+			u = u.Sub(Uint128{Lo: uint64(-step)}.Lsh(suffix))
 		}
 
 		outIP := make(net.IP, net.IPv6len)

@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"math/bits"
 	"net"
+
+	u128 "github.com/Pilatuz/bigx/v2/uint128"
 )
 
 // SummarizeRange returns a series of networks which cover the range
@@ -95,7 +97,7 @@ func summarizeRange4(first, last uint32) (networks []*net.IPNet) {
 
 // summarizeRange6 returns a series of IPv6 networks which cover the range
 // between the first and last IPv6 addresses, inclusive.
-func summarizeRange6(first, last uint128) (networks []*net.IPNet) {
+func summarizeRange6(first, last Uint128) (networks []*net.IPNet) {
 	for first.Cmp(last) <= 0 { // first <= last
 		// the network will either be as long as all the trailing zeros of the first address OR the number of bits
 		// necessary to cover the distance between first and last address -- whichever is smaller
@@ -105,7 +107,7 @@ func summarizeRange6(first, last uint128) (networks []*net.IPNet) {
 		}
 
 		// check extremes to make sure no overflow
-		if !first.Equal(uint128{0, 0}) || !last.Equal(uint128{maxUint64, maxUint64}) {
+		if !first.IsZero() || !last.Equals(u128.Max()) {
 			d := last.Sub(first).Add64(1)
 			if z := 127 - d.LeadingZeros(); z < nBits {
 				nBits = z
@@ -121,8 +123,8 @@ func summarizeRange6(first, last uint128) (networks []*net.IPNet) {
 				Mask: nwkMask,
 			})
 
-		first = first.Add(uint128{0, 1}.Lsh(uint(nBits)))
-		if first.Equal(uint128{0, 0}) {
+		first = first.Add(Uint128{Lo: 1}.Lsh(uint(nBits)))
+		if first.IsZero() {
 			break
 		}
 	}

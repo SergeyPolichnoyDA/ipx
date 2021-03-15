@@ -20,11 +20,11 @@ func Split(ipNet *net.IPNet, newPrefix int) *NetIter {
 
 	ip := to128(ipNet.IP)
 
-	incr := uint128{0, 1}.Lsh(uint(bits - newPrefix))
+	incr := Uint128{Lo: 1}.Lsh(uint(bits - newPrefix))
 
-	broadCast := uint128{0, 1}.
+	broadCast := Uint128{Lo: 1}.
 		Lsh(uint(bits - ones)).
-		Sub(uint128{0, 1}).
+		Sub64(1).
 		Or(ip)
 
 	return &NetIter{
@@ -47,8 +47,8 @@ func Addresses(ipNet *net.IPNet) *IPIter {
 	ip := to128(ipNet.IP)
 	return iterIPv6(
 		ip,
-		uint128{0, 1},
-		ip.Add(uint128{0, 1}.Lsh(uint(bits-ones))),
+		Uint128{Lo: 1},
+		ip.Add(Uint128{Lo: 1}.Lsh(uint(bits-ones))),
 	)
 }
 
@@ -64,15 +64,15 @@ func Hosts(ipNet *net.IPNet) *IPIter {
 		)
 	}
 
-	ip := to128(ipNet.IP).Add(uint128{0, 1})
+	ip := to128(ipNet.IP).Add64(1)
 
-	addend := uint128{0, 1}.
+	addend := Uint128{Lo: 1}.
 		Lsh(uint(bits - ones)).
-		Sub(uint128{0, 2})
+		Sub64(2)
 
 	return iterIPv6(
 		ip,
-		uint128{0, 1},
+		Uint128{Lo: 1},
 		ip.Add(addend),
 	)
 }
