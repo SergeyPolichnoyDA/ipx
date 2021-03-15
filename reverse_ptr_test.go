@@ -44,4 +44,8 @@ func TestReversePTR(t *testing.T) {
 		ipx.ReversePTR(net.ParseIP("::")))
 	assert.Equal(t, "f.f.f.f.f.f.f.f.f.f.f.f.f.f.f.f.f.f.f.f.f.f.f.f.f.f.f.f.f.f.f.f.ip6.arpa",
 		ipx.ReversePTR(net.ParseIP("ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff")))
+
+	// bad
+	assert.Equal(t, "", ipx.ReversePTR(net.ParseIP("bad")))
+	assert.Equal(t, "", ipx.ReversePTR(make(net.IP, 3)))
 }

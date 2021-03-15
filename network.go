@@ -20,29 +20,29 @@ func Supernet(network *net.IPNet, targetPrefixLen int) *net.IPNet {
 
 	// IPv4
 	if v4 := network.IP.To4(); v4 != nil {
-		ip := load32(v4)
+		u := load32(v4)
 		mask := ((uint32(1) << targetPrefixLen) - 1) << (bits - targetPrefixLen)
 
-		outIP := make(net.IP, net.IPv4len)
-		store32(ip&mask, outIP)
+		out := make(net.IP, net.IPv4len)
+		store32(u&mask, out)
 		return &net.IPNet{
-			IP:   outIP,
+			IP:   out,
 			Mask: net.CIDRMask(targetPrefixLen, bits),
 		}
 	}
 
 	// IPv6
 	if v6 := network.IP.To16(); v6 != nil {
-		ip := load128(v6)
+		u := load128(v6)
 		mask := Uint128{Lo: 1}.
 			Lsh(uint(targetPrefixLen)).
 			Sub64(1).
 			Lsh(uint(bits - targetPrefixLen))
 
-		outIP := make(net.IP, net.IPv6len)
-		store128(ip.And(mask), outIP)
+		out := make(net.IP, net.IPv6len)
+		store128(u.And(mask), out)
 		return &net.IPNet{
-			IP:   outIP,
+			IP:   out,
 			Mask: net.CIDRMask(targetPrefixLen, bits),
 		}
 	}
@@ -60,23 +60,23 @@ func Broadcast(network *net.IPNet) net.IP {
 
 	// IPv4
 	if v4 := network.IP.To4(); v4 != nil {
-		ip := load32(v4)
-		mask := (uint32(1) << (bits - ones)) - 1
+		u := load32(v4)
+		bcmask := (uint32(1) << (bits - ones)) - 1
 
 		out := make(net.IP, net.IPv4len)
-		store32(ip|mask, out)
+		store32(u|bcmask, out)
 		return out
 	}
 
 	// IPv6
 	if v6 := network.IP.To16(); v6 != nil {
-		ip := load128(network.IP)
-		mask := Uint128{Lo: 1}.
+		u := load128(network.IP)
+		bcmask := Uint128{Lo: 1}.
 			Lsh(uint(bits - ones)).
 			Sub64(1)
 
 		out := make(net.IP, net.IPv6len)
-		store128(ip.Or(mask), out)
+		store128(u.Or(bcmask), out)
 		return out
 	}
 
@@ -119,11 +119,11 @@ func NextNetwork(network *net.IPNet, step int) *net.IPNet {
 			u -= uint32(-step << suffix)
 		}
 
-		outIP := make(net.IP, net.IPv4len)
-		store32(u, outIP)
+		out := make(net.IP, net.IPv4len)
+		store32(u, out)
 		return &net.IPNet{
-			IP:   outIP,
-			Mask: network.Mask,
+			IP:   out,
+			Mask: network.Mask, // shared
 		}
 	}
 
@@ -139,11 +139,11 @@ func NextNetwork(network *net.IPNet, step int) *net.IPNet {
 			u = u.Sub(Uint128{Lo: uint64(-step)}.Lsh(suffix))
 		}
 
-		outIP := make(net.IP, net.IPv6len)
-		store128(u, outIP)
+		out := make(net.IP, net.IPv6len)
+		store128(u, out)
 		return &net.IPNet{
-			IP:   outIP,
-			Mask: network.Mask,
+			IP:   out,
+			Mask: network.Mask, // shared
 		}
 	}
 

@@ -22,7 +22,7 @@ func ReversePTR(address net.IP) string {
 	if v4 := address.To4(); v4 != nil {
 		// write IP address bytes (in reverse order)
 		for i := len(v4) - 1; i >= 0; i-- {
-			buf.WriteString(strconv.Itoa(int(v4[i])))
+			buf.WriteString(strconv.FormatUint(uint64(v4[i]), 10))
 			buf.WriteRune('.')
 		}
 
