@@ -5,7 +5,7 @@ import (
 	"net"
 	"testing"
 
-	"github.com/ns1/ipx"
+	"github.com/ns1/ipx/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

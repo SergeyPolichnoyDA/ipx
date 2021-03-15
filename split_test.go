@@ -2,7 +2,7 @@ package ipx_test
 
 import (
 	"fmt"
-	"github.com/ns1/ipx"
+	"github.com/ns1/ipx/v2"
 	"net"
 	"testing"
 )
